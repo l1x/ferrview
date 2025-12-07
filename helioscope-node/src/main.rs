@@ -11,13 +11,17 @@ use crate::probes::sysinfo::{cpu, mem, temp};
 
 mod probes;
 
+fn default_config_file() -> String {
+    String::from("helioscope-node.toml")
+}
+
 #[derive(FromArgs, Debug)]
 #[argh(description = "A brief description of what your program does.")]
 #[argh(help_triggers("-h", "--help", "help"))]
 pub struct Argz {
-    /// whether or not to jump
-    #[argh(switch, short = 'c')]
-    collector: bool,
+    /// config file location
+    #[argh(option, default = "default_config_file()")]
+    config_file: String,
 }
 
 #[derive(Debug, Deserialize)]
@@ -69,11 +73,8 @@ fn main() {
     info!("Starting helioscope");
 
     let argz: Argz = argh::from_env();
-    if argz.collector {
-        info!("Starting collector mode")
-    }
-
     debug!("Args: {:?}", argz);
+    info!("Config file is read from: {}", argz.config_file);
 
     let config = Config::load("helioscope.toml").expect("Failed to load helioscope.toml");
 

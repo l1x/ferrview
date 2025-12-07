@@ -1,0 +1,15 @@
+[tasks.lint]
+description = "Lint with Clippy, failing on warnings"
+run = "cargo clippy -- -D warnings"
+
+[tasks.check]
+description = "Cargo check"
+run = "cargo check"
+
+[tasks.build-rust-dev]
+description = "[DEV] cargo build"
+run = "cargo build"
+
+[tasks.build-rust-release]
+description = "[RELEASE] cargo build --release "
+run = "cargo build --release"

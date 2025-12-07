@@ -1,12 +1,20 @@
-[package]
-name = "helioscope"
+[workspace]
+resolver = "2"
+members = [
+  "helioscope-collector",
+  "helioscope-node",
+]
+
+[workspace.package]
 version = "0.1.0"
 edition = "2024"
+description = "A lightweight system monitoring tool with node agents and collector"
+repository = ""
+license = "AGPL-3.0"
 
-[dependencies]
-argh = "0.1.13"
+[workspace.dependencies]
+argh = { version = "0.1" }
 serde = { version = "1.0", features = ["derive"] }
-sysinfo = { version = "0.37" }
 time = { version = "0.3", features = ["formatting", "macros"] }
 toml = { version = "0.8" }
 tracing = { version = "0.1" }
@@ -21,11 +29,11 @@ lto = "thin"
 codegen-units = 8
 
 [profile.release]
-opt-level = "s"  # reduces binary size
-debug = "full"  # No one needs an undebuggable release binary
-split-debuginfo = "packed"  # generates a separate *.dwp/*.dSYM so the binary can get stripped
-strip = "symbols"  # See split-debuginfo - reduces binary size
-lto = true  # reduces binary size
-panic = "abort"  # reduces binary size
-incremental = true  # Improves re-compile times
-codegen-units = 1  # reduces binary size
+opt-level = "s"
+debug = "full"
+split-debuginfo = "packed"
+strip = "symbols"
+lto = true
+panic = "abort"
+incremental = true
+codegen-units = 1
