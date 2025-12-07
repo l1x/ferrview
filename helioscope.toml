@@ -1,0 +1,7 @@
+[probes.sysinfo]
+static_info = true
+cpu = true
+memory = true
+disk = true
+network = true
+temperature = true

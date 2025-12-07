@@ -1,0 +1,30 @@
+[package]
+name = "helioscope"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+serde = { version = "1.0", features = ["derive"] }
+sysinfo = { version = "0.37" }
+time = { version = "0.3", features = ["formatting", "macros"] }
+toml = { version = "0.8" }
+tracing = { version = "0.1" }
+tracing-subscriber = { version = "0.3", features = ["fmt", "time"] }
+
+[profile.bench]
+lto = "thin"
+codegen-units = 16
+
+[profile.dev]
+lto = "thin"
+codegen-units = 8
+
+[profile.release]
+opt-level = "s"  # reduces binary size
+debug = "full"  # No one needs an undebuggable release binary
+split-debuginfo = "packed"  # generates a separate *.dwp/*.dSYM so the binary can get stripped
+strip = "symbols"  # See split-debuginfo - reduces binary size
+lto = true  # reduces binary size
+panic = "abort"  # reduces binary size
+incremental = true  # Improves re-compile times
+codegen-units = 1  # reduces binary size
