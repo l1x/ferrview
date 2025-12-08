@@ -1,7 +1,7 @@
 use bytes::Bytes;
 use helioscope_common::ProbeDataPoint;
 use http_body_util::Full;
-use hyper::{Request, StatusCode, body::Incoming};
+use hyper::{Request, StatusCode};
 use hyper_util::{
     client::legacy::{Client, connect::HttpConnector},
     rt::TokioExecutor,

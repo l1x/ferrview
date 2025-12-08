@@ -5,6 +5,7 @@ use std::fs;
 pub struct Config {
     pub node_id: String,
     pub metrics_collector_addr: String,
+    #[serde(default = "default_collection_interval")]
     pub collection_interval_secs: u64,
     pub probes: ProbesConfig,
 }
