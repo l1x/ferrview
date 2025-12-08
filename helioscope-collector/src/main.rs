@@ -3,6 +3,7 @@ use time::macros::format_description;
 use tracing::{debug, error, info};
 use tracing_subscriber::fmt::time::UtcTime;
 
+mod charts;
 mod http;
 mod store;
 

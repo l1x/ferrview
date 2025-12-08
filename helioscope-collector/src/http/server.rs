@@ -76,6 +76,7 @@ async fn handle_request(
     let response = match (req.method(), req.uri().path()) {
         (&Method::POST, "/api/v1/probe") => handlers::handle_probe_data(req, state).await,
         (&Method::GET, "/health") => handlers::handle_health().await,
+        (&Method::GET, "/ui") => super::ui::handle_ui_home().await,
         _ => handlers::handle_not_found().await,
     };
 

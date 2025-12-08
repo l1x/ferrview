@@ -14,6 +14,9 @@ helioscope-common = { path = "../helioscope-common" }
 http-body-util = { version = "0.1" }
 hyper = { version = "1.0", features = ["http2", "server"] }
 hyper-util = { version = "0.1", features = ["server-auto", "tokio"] }
+plotters = { version = "0.3", default-features = false, features = [
+  "svg_backend"
+] }
 serde.workspace = true
 serde_json = { version = "1" }
 sqlx = { version = "0.8.6", features = ["sqlite"] }
