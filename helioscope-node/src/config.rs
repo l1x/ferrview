@@ -17,8 +17,6 @@ fn default_collection_interval() -> u64 {
 #[derive(Debug, Deserialize)]
 pub struct ProbesConfig {
     pub sysinfo: SysinfoProbes,
-    // Future: other probe sources
-    // pub something_else: SomethingElseProbes,
 }
 
 #[derive(Debug, Deserialize)]
@@ -26,6 +24,7 @@ pub struct SysinfoProbes {
     pub cpu: bool,
     pub memory: bool,
     pub temperature: bool,
+    pub static_info: bool,
 }
 
 impl Config {

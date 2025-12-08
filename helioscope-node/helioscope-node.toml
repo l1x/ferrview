@@ -10,3 +10,4 @@ collection_interval_secs = 60
 cpu = true
 memory = true
 temperature = true
+static_info = true

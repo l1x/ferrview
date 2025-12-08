@@ -8,7 +8,7 @@ use crate::{
     client::http::HttpClient,
     client::retry::send_with_retry,
     config::Config,
-    probes::sysinfo::{cpu, mem, temp},
+    probes::sysinfo::{cpu, mem, statik, temp},
     utils::timestamp::get_utc_formatter,
 };
 
@@ -71,6 +71,13 @@ async fn main() {
         let mut all_data = Vec::new();
 
         // Collect all enabled probes
+
+        if config.probes.sysinfo.static_info {
+            let static_info = statik::probe_static_info(&config.node_id);
+            debug!("Collected {} static info metrics", static_info.len());
+            all_data.extend(static_info);
+        }
+
         if config.probes.sysinfo.cpu {
             let cpu_data = cpu::probe_cpu(&sys, &config.node_id);
             debug!("Collected {} CPU metrics", cpu_data.len());
