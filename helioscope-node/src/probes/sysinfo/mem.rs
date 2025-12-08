@@ -1,37 +1,55 @@
+use helioscope_common::ProbeDataPoint;
 use sysinfo::System;
 use tracing::info;
 
-pub fn probe_memory(sys: &System) {
+use crate::utils::timestamp::get_utc_timestamp;
+
+pub fn probe_memory(sys: &System, node_id: &str) -> Vec<ProbeDataPoint> {
     info!("Starting memory probe");
+
+    let mut data_points = Vec::new();
+    let timestamp = get_utc_timestamp();
 
     let total_memory = sys.total_memory();
     let used_memory = sys.used_memory();
     let total_swap = sys.total_swap();
     let used_swap = sys.used_swap();
 
-    let memory_usage_percent = if total_memory > 0 {
-        (used_memory as f64 / total_memory as f64) * 100.0
-    } else {
-        0.0
-    };
+    // Adding total memory
+    data_points.push(ProbeDataPoint {
+        node_id: node_id.to_string(),
+        timestamp: timestamp.clone(),
+        probe_type: "sysinfo".to_string(),
+        probe_name: "memory_total_bytes".to_string(),
+        probe_value: total_memory.to_string(),
+    });
 
-    let swap_usage_percent = if total_swap > 0 {
-        (used_swap as f64 / total_swap as f64) * 100.0
-    } else {
-        0.0
-    };
+    // Adding used memory
+    data_points.push(ProbeDataPoint {
+        node_id: node_id.to_string(),
+        timestamp: timestamp.clone(),
+        probe_type: "sysinfo".to_string(),
+        probe_name: "memory_used_bytes".to_string(),
+        probe_value: used_memory.to_string(),
+    });
 
-    info!(
-        total_memory_bytes = total_memory,
-        used_memory_bytes = used_memory,
-        memory_usage_percent = format!("{:.1}", memory_usage_percent),
-        "MEM: "
-    );
+    // Adding total swap
+    data_points.push(ProbeDataPoint {
+        node_id: node_id.to_string(),
+        timestamp: timestamp.clone(),
+        probe_type: "sysinfo".to_string(),
+        probe_name: "swap_total_bytes".to_string(),
+        probe_value: total_swap.to_string(),
+    });
 
-    info!(
-        total_swap_bytes = total_swap,
-        used_swap_bytes = used_swap,
-        swap_usage_percent = format!("{:.1}", swap_usage_percent),
-        "SWAP: "
-    );
+    // Adding used swap
+    data_points.push(ProbeDataPoint {
+        node_id: node_id.to_string(),
+        timestamp: timestamp.clone(),
+        probe_type: "sysinfo".to_string(),
+        probe_name: "swap_used_bytes".to_string(),
+        probe_value: used_swap.to_string(),
+    });
+
+    data_points
 }

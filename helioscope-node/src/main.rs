@@ -2,13 +2,16 @@ use argh::FromArgs;
 use serde::Deserialize;
 use std::fs;
 use sysinfo::System;
-use time::macros::format_description;
 use tracing::{debug, info};
-use tracing_subscriber::fmt::time::UtcTime;
+use tracing_subscriber::{EnvFilter, fmt::time::UtcTime};
 
-use crate::probes::sysinfo::{cpu, mem, temp};
+use crate::{
+    probes::sysinfo::{cpu, mem, temp},
+    utils::timestamp::get_utc_formatter,
+};
 
 mod probes;
+mod utils;
 
 fn default_config_file() -> String {
     String::from("helioscope-node.toml")
@@ -56,16 +59,11 @@ impl Config {
 
 fn main() {
     // Initialize tracing
-    //
-    let timer = UtcTime::new(format_description!(
-        "[year]-[month padding:zero]-[day padding:zero]T[hour padding:zero]:[minute padding:zero]:[second padding:zero]Z"
-    ));
-
+    let timer = UtcTime::new(get_utc_formatter());
+    let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
+    // Subscribe
     tracing_subscriber::fmt()
-        .with_env_filter(
-            tracing_subscriber::EnvFilter::try_from_default_env()
-                .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new("info")),
-        )
+        .with_env_filter(env_filter)
         .with_timer(timer)
         .init();
 
@@ -88,11 +86,13 @@ fn main() {
     }
 
     if config.probes.sysinfo.memory {
-        mem::probe_memory(&sys);
+        let mem_data = mem::probe_memory(&sys, &config.node_id);
+        debug!("{:?}", mem_data);
     }
 
     if config.probes.sysinfo.temperature {
-        temp::probe_temperature();
+        let temp_data = temp::probe_temperature(&config.node_id);
+        debug!("{:?}", temp_data);
     }
 
     info!("Helioscope complete");
