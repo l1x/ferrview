@@ -1,15 +1,15 @@
 use argh::FromArgs;
-use serde::Deserialize;
-use std::fs;
 use sysinfo::System;
 use tracing::{debug, info};
 use tracing_subscriber::{EnvFilter, fmt::time::UtcTime};
 
 use crate::{
+    config::Config,
     probes::sysinfo::{cpu, mem, temp},
     utils::timestamp::get_utc_formatter,
 };
 
+mod config;
 mod probes;
 mod utils;
 
@@ -18,7 +18,7 @@ fn default_config_file() -> String {
 }
 
 #[derive(FromArgs, Debug)]
-#[argh(description = "A brief description of what your program does.")]
+#[argh(description = "Helioscope metrics collection node")]
 #[argh(help_triggers("-h", "--help", "help"))]
 pub struct Argz {
     /// config file location
@@ -26,42 +26,11 @@ pub struct Argz {
     config_file: String,
 }
 
-#[derive(Debug, Deserialize)]
-pub struct ProbesConfig {
-    pub sysinfo: SysinfoProbes,
-    // Future: other probe sources
-    // pub something_else: SomethingElseProbes,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct SysinfoProbes {
-    pub cpu: bool,
-    pub memory: bool,
-    pub disk: bool,
-    pub network: bool,
-    pub temperature: bool,
-    pub static_info: bool,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct Config {
-    pub node_id: String,
-    pub metrics_collector_addr: String,
-    pub probes: ProbesConfig,
-}
-
-impl Config {
-    pub fn load(path: &str) -> Result<Self, Box<dyn std::error::Error>> {
-        let content = fs::read_to_string(path)?;
-        Ok(toml::from_str(&content)?)
-    }
-}
-
 fn main() {
     // Initialize tracing
     let timer = UtcTime::new(get_utc_formatter());
     let env_filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| EnvFilter::new("info"));
-    // Subscribe
+
     tracing_subscriber::fmt()
         .with_env_filter(env_filter)
         .with_timer(timer)
