@@ -511,6 +511,7 @@ dependencies = [
  "argh",
  "bytes",
  "helioscope-common",
+ "http-body-util",
  "hyper",
  "hyper-util",
  "serde",

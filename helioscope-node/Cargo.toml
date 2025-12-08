@@ -9,7 +9,8 @@ license.workspace = true
 [dependencies]
 argh.workspace = true
 bytes = { version = "1.0" }
-helioscope-common = { path = "../helioscope-common" }  # Add this
+helioscope-common = { path = "../helioscope-common" }
+http-body-util = { version = "0.1" }
 hyper = { version = "1.0", features = ["client", "http2"] }
 hyper-util = { version = "0.1", features = ["client-legacy", "http2", "tokio"] }
 serde.workspace = true
