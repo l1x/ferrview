@@ -142,11 +142,19 @@ pub async fn handle_temperature_chart(
         }
     };
 
-    if metrics.is_empty() {
+    // Filter to only include actual temperature readings, exclude max and critical thresholds
+    let filtered_metrics: Vec<_> = metrics
+        .into_iter()
+        .filter(|m| {
+            !m.probe_name.contains("_max_celsius") && !m.probe_name.contains("_critical_celsius")
+        })
+        .collect();
+
+    if filtered_metrics.is_empty() {
         return response::svg_error("No temperature data available");
     }
 
-    let series_map = helpers::group_metrics_by_index(&metrics, "temperature_sensor_");
+    let series_map = helpers::group_metrics_by_index(&filtered_metrics, "temperature_sensor_");
 
     if series_map.is_empty() {
         return response::svg_error("No temperature data found");

@@ -4,9 +4,12 @@
 #[derive(Debug, Clone)]
 pub struct NodeSummary {
     pub node_id: String,
+    pub hostname: Option<String>,
+    pub cpu_arch: Option<String>,
     pub cpu_cores: Option<String>,
     pub memory_total_gb: Option<f64>,
     pub temp_sensors: Option<String>,
+    pub max_temp_celsius: Option<f64>,
     pub last_seen: Option<String>,
 }
 
@@ -27,9 +30,12 @@ impl NodeSummary {
     pub fn new(node_id: String) -> Self {
         Self {
             node_id,
+            hostname: None,
+            cpu_arch: None,
             cpu_cores: None,
             memory_total_gb: None,
             temp_sensors: None,
+            max_temp_celsius: None,
             last_seen: None,
         }
     }

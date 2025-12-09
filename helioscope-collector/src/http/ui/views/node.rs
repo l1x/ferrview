@@ -13,6 +13,7 @@ pub fn render(node: &NodeDetails) -> String {
     let short_id = helpers::shorten_uuid(&node.node_id);
 
     let hostname = node.hostname.as_deref().unwrap_or("N/A");
+    let display_name = node.hostname.as_deref().unwrap_or(&short_id);
     let os = node.os_name.as_deref().unwrap_or("N/A");
     let kernel = node.kernel_version.as_deref().unwrap_or("N/A");
     let arch = node.cpu_arch.as_deref().unwrap_or("N/A");
@@ -25,7 +26,7 @@ pub fn render(node: &NodeDetails) -> String {
     let header = format!(
         r#"        <header>
             <div class="breadcrumb"><a href="/ui">← Back to Dashboard</a></div>
-            <h1>Node: {}</h1>
+            <h1>{}</h1>
             <p class="node-id-full">{}</p>
             <div class="node-meta">
                 {}
@@ -36,7 +37,7 @@ pub fn render(node: &NodeDetails) -> String {
                 {}
             </div>
         </header>"#,
-        short_id,
+        display_name,
         node.node_id,
         components::meta_item("Hostname", hostname),
         components::meta_item("OS", os),

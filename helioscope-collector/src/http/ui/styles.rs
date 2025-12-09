@@ -123,7 +123,14 @@ pub const NODE_CARDS: &str = r#"
     padding-bottom: 15px;
     border-bottom: 1px solid var(--border-color);
 }
-.node-header h3 { color: var(--text-primary); font-size: 1.3em; }
+.node-header h3 { color: var(--text-primary); font-size: 1.3em; margin-bottom: 5px; }
+.node-header .subtitle {
+    margin: 0;
+    padding: 0;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    font-weight: normal;
+}
 .status-badge {
     padding: 5px 12px;
     border-radius: 20px;

@@ -50,12 +50,18 @@ pub fn render(nodes: &[NodeSummary]) -> String {
 
 fn render_node_card(node: &NodeSummary) -> String {
     let short_id = helpers::shorten_uuid(&node.node_id);
+    let hostname = node.hostname.as_deref().unwrap_or(&short_id);
+    let arch = node.cpu_arch.as_deref().unwrap_or("N/A");
     let cpu = node.cpu_cores.as_deref().unwrap_or("N/A");
     let memory = node
         .memory_total_gb
         .map(helpers::format_memory_gb)
         .unwrap_or_else(|| "N/A".to_string());
     let sensors = node.temp_sensors.as_deref().unwrap_or("N/A");
+    let max_temp = node
+        .max_temp_celsius
+        .map(|t| format!("{:.1}°C", t))
+        .unwrap_or_else(|| "N/A".to_string());
     let last_seen = node
         .last_seen
         .as_ref()
@@ -65,10 +71,12 @@ fn render_node_card(node: &NodeSummary) -> String {
     format!(
         r#"            <div class="node-card">
                 <div class="node-header">
-                    <h3>Node: {}</h3>
+                    <h3>{}</h3>
+                    <p class="subtitle">{}</p>
                     <span class="status-badge">Active</span>
                 </div>
                 <div class="node-info">
+                    {}
                     {}
                     {}
                     {}
@@ -82,11 +90,13 @@ fn render_node_card(node: &NodeSummary) -> String {
                 </div>
             </div>
 "#,
-        short_id,
+        hostname,
+        arch,
         components::info_row("Full ID", &node.node_id),
         components::info_row("CPU Cores", cpu),
         components::info_row("Memory", &memory),
         components::info_row("Temp Sensors", sensors),
+        components::info_row("Max Temp", &max_temp),
         components::info_row("Last Seen", &last_seen),
         components::button(
             &format!("/ui/node/{}", node.node_id),

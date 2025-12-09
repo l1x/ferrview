@@ -80,12 +80,15 @@ fn render_error(title: &str, message: &str) -> (StatusCode, BoxBody) {
 
 fn build_node_summary(node_id: &str, metrics: &[MetricDataPoint]) -> NodeSummary {
     let mut summary = NodeSummary::new(node_id.to_string());
+    let mut max_temp: Option<f64> = None;
 
     for metric in metrics {
         if summary.last_seen.is_none() && !metric.timestamp.is_empty() {
             summary.last_seen = Some(metric.timestamp.clone());
         }
         match metric.probe_name.as_str() {
+            "system_hostname" => summary.hostname = Some(metric.probe_value.clone()),
+            "system_cpu_arch" => summary.cpu_arch = Some(metric.probe_value.clone()),
             "cpu_core_count" => summary.cpu_cores = Some(metric.probe_value.clone()),
             "memory_total_bytes" => {
                 if let Ok(bytes) = metric.probe_value.parse::<f64>() {
@@ -93,10 +96,20 @@ fn build_node_summary(node_id: &str, metrics: &[MetricDataPoint]) -> NodeSummary
                 }
             }
             "temperature_sensor_count" => summary.temp_sensors = Some(metric.probe_value.clone()),
-            _ => {}
+            _ => {
+                // Extract temperature sensor readings to find max
+                if metric.probe_name.starts_with("temperature_sensor_")
+                    && metric.probe_name.ends_with("_celsius")
+                {
+                    if let Ok(temp) = metric.probe_value.parse::<f64>() {
+                        max_temp = Some(max_temp.map_or(temp, |current| current.max(temp)));
+                    }
+                }
+            }
         }
     }
 
+    summary.max_temp_celsius = max_temp;
     summary
 }
 
