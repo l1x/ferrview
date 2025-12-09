@@ -84,8 +84,6 @@ fn render_node_card(node: &NodeSummary) -> String {
                 </div>
                 <div class="node-actions">
                     {}
-                    {}
-                    {}
                 </div>
             </div>
 "#,
@@ -99,18 +97,8 @@ fn render_node_card(node: &NodeSummary) -> String {
         components::info_row("Last Seen", &last_seen),
         components::button(
             &format!("/ui/node/{}", node.node_id),
-            "View Dashboard",
+            "View Node",
             "primary"
-        ),
-        components::button(
-            &format!("/ui/node/{}/cpu.svg", node.node_id),
-            "CPU Chart",
-            "secondary"
-        ),
-        components::button(
-            &format!("/ui/node/{}/memory.svg", node.node_id),
-            "Memory Chart",
-            "secondary"
         ),
     )
 }
