@@ -1,0 +1,46 @@
+# Contributor:
+# Maintainer:
+pkgname=ferrview-node
+pkgver=
+pkgrel=0
+pkgdesc=""
+url=""
+arch="all"
+license=""
+depends=""
+makedepends=""
+checkdepends=""
+install="$pkgname.pre-install $pkgname.post-install"
+subpackages="$pkgname-dev $pkgname-doc"
+source="
+	ferrview-node.initd
+	ferrview-node.confd
+	"
+builddir="$srcdir/"
+
+build() {
+	# Replace with proper build command(s).
+	# Remove if there is no build command.
+	:
+}
+
+check() {
+	# Replace with proper check command(s).
+	# Remove and add !check option if there is no check command.
+	:
+}
+
+package() {
+	# Replace with proper package command(s)
+	:
+
+	install -m755 -D "$srcdir"/$pkgname.initd \
+		"$pkgdir"/etc/init.d/$pkgname
+	install -m644 -D "$srcdir"/$pkgname.confd \
+		"$pkgdir"/etc/conf.d/$pkgname
+}
+
+sha512sums="
+e490c79421f532f894bd69fc2b44aeeab10d856dc0848d4679b3fa9cf2939e0501727c8a2c7ae8b850a8eed3de0adc41e9b6315c767bc0b77489171cd52d3e92  ferrview-node.initd
+74fd6d07fb26ff43b257e8b914facdc220d3d84956adfb7bb302e5b65d718967dacb76133b59fde77855c5c94eada88292dd3cc9b80be3e14a570c96490e7080  ferrview-node.confd
+"
