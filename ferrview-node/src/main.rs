@@ -1,6 +1,6 @@
 use argh::FromArgs;
 use std::time::Duration;
-use sysinfo::System;
+use sysinfo::{Components, Disks, System};
 use tracing::{debug, error, info};
 use tracing_subscriber::{EnvFilter, fmt::time::UtcTime};
 
@@ -59,6 +59,14 @@ async fn main() {
 
     // Initialize system info
     let mut sys = System::new_all();
+    let mut disks = Disks::new_with_refreshed_list();
+    let mut components = Components::new_with_refreshed_list();
+
+    // Perform initial CPU refresh with delay for accurate first reading
+    info!("Performing initial CPU refresh for accurate readings");
+    sys.refresh_cpu_usage();
+    tokio::time::sleep(Duration::from_millis(200)).await;
+    sys.refresh_cpu_usage();
 
     let interval = Duration::from_secs(config.collection_interval_secs);
 
@@ -91,13 +99,13 @@ async fn main() {
         }
 
         if config.probes.sysinfo.disk {
-            let disk_data = disk::probe_disks(&config.node_id);
+            let disk_data = disk::probe_disks(&mut disks, &config.node_id);
             debug!("Collected {} disk metrics", disk_data.len());
             all_data.extend(disk_data);
         }
 
         if config.probes.sysinfo.temperature {
-            let temp_data = temp::probe_temperature(&config.node_id);
+            let temp_data = temp::probe_temperature(&mut components, &config.node_id);
             debug!("Collected {} temperature metrics", temp_data.len());
             all_data.extend(temp_data);
         }

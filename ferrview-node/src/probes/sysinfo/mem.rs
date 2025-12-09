@@ -12,6 +12,7 @@ pub fn probe_memory(sys: &System, node_id: &str) -> Vec<ProbeDataPoint> {
 
     let total_memory = sys.total_memory();
     let used_memory = sys.used_memory();
+    let available_memory = sys.available_memory();
     let total_swap = sys.total_swap();
     let used_swap = sys.used_swap();
 
@@ -31,6 +32,15 @@ pub fn probe_memory(sys: &System, node_id: &str) -> Vec<ProbeDataPoint> {
         probe_type: "sysinfo".to_string(),
         probe_name: "memory_used_bytes".to_string(),
         probe_value: used_memory.to_string(),
+    });
+
+    // Adding available memory
+    data_points.push(ProbeDataPoint {
+        node_id: node_id.to_string(),
+        timestamp: timestamp.clone(),
+        probe_type: "sysinfo".to_string(),
+        probe_name: "memory_available_bytes".to_string(),
+        probe_value: available_memory.to_string(),
     });
 
     // Adding total swap

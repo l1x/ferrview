@@ -4,14 +4,14 @@ use tracing::info;
 
 use crate::utils::timestamp::get_utc_timestamp;
 
-pub fn probe_disks(node_id: &str) -> Vec<ProbeDataPoint> {
+pub fn probe_disks(disks: &mut Disks, node_id: &str) -> Vec<ProbeDataPoint> {
     info!("Starting disk probe");
 
     let mut data_points = Vec::new();
     let timestamp = get_utc_timestamp();
 
-    // Get refreshed list of disks
-    let disks = Disks::new_with_refreshed_list();
+    // Refresh disk information
+    disks.refresh(false);
     let disk_count = disks.len();
     info!("Detected {} disk(s)", disk_count);
 
@@ -70,9 +70,25 @@ pub fn probe_disks(node_id: &str) -> Vec<ProbeDataPoint> {
             });
         }
 
-        // Note: Filesystem type and mount point are available but require
-        // additional handling. For now, we focus on core disk metrics.
-        // These can be added in a future enhancement.
+        // Filesystem type
+        let fs_type = disk.file_system().to_string_lossy().into_owned();
+        data_points.push(ProbeDataPoint {
+            node_id: node_id.to_string(),
+            timestamp: timestamp.clone(),
+            probe_type: "sysinfo".to_string(),
+            probe_name: format!("disk_{}_filesystem_type", idx),
+            probe_value: fs_type,
+        });
+
+        // Mount point
+        let mount_point = disk.mount_point().to_string_lossy().into_owned();
+        data_points.push(ProbeDataPoint {
+            node_id: node_id.to_string(),
+            timestamp: timestamp.clone(),
+            probe_type: "sysinfo".to_string(),
+            probe_name: format!("disk_{}_mount_point", idx),
+            probe_value: mount_point,
+        });
     }
 
     info!("Collected {} disk metrics", data_points.len());

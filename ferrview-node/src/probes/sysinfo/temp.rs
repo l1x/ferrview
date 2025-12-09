@@ -4,13 +4,14 @@ use tracing::info;
 
 use crate::utils::timestamp::get_utc_timestamp;
 
-pub fn probe_temperature(node_id: &str) -> Vec<ProbeDataPoint> {
+pub fn probe_temperature(components: &mut Components, node_id: &str) -> Vec<ProbeDataPoint> {
     info!("Starting temperature probe");
 
     let mut data_points = Vec::new();
     let timestamp = get_utc_timestamp();
 
-    let components = Components::new_with_refreshed_list();
+    // Refresh component information
+    components.refresh(false);
     let component_count = components.len();
     info!("Detected {} temperature sensors", component_count);
 
