@@ -1,10 +1,10 @@
-# Helioscope
+# Ferrview
 
 A lightweight system monitoring tool written in Rust.
 
 ## Overview
 
-Helioscope is a modular system monitoring utility designed to collect and display system information through configurable probes. It uses the `sysinfo` crate to gather comprehensive system data and provides structured output via structured logging.
+Ferrview is a modular system monitoring utility designed to collect and display system information through configurable probes. It uses the `sysinfo` crate to gather comprehensive system data and provides structured output via structured logging.
 
 ## Features
 
@@ -27,17 +27,17 @@ Helioscope is a modular system monitoring utility designed to collect and displa
 ```bash
 # Clone the repository
 git clone <repository-url>
-cd helioscope
+cd ferrview
 
 # Build the project
 cargo build --release
 
-# The binary will be available at target/release/helioscope
+# The binary will be available at target/release/ferrview
 ```
 
 ## Configuration
 
-Helioscope uses a TOML configuration file (`helioscope.toml`) to control which probes are active:
+Ferrview uses a TOML configuration file (`ferrview.toml`) to control which probes are active:
 
 ```toml
 node_id = "uuid or similar (string)"
@@ -60,7 +60,7 @@ temperature = true   # Hardware temperature sensors
 
 ```bash
 # Run with default configuration
-./helioscope
+./ferrview
 
 # Or using cargo
 cargo run
@@ -68,10 +68,10 @@ cargo run
 
 ### Output Format
 
-Helioscope outputs structured JSON logs with UTC timestamps:
+Ferrview outputs structured JSON logs with UTC timestamps:
 
 ```
-2024-01-01T12:00:00Z INFO Starting helioscope
+2024-01-01T12:00:00Z INFO Starting ferrview
 2024-01-01T12:00:00Z INFO Starting CPU probe
 2024-01-01T12:00:00Z INFO Detected 8 CPU cores
 ```
@@ -87,10 +87,10 @@ Helioscope outputs structured JSON logs with UTC timestamps:
 ## Project Structure
 
 ```
-helioscope/
-├── helioscope-common/      # Shared library and data structures
+ferrview/
+├── ferrview-common/      # Shared library and data structures
 │   └── src/lib.rs
-├── helioscope-node/        # Node agent
+├── ferrview-node/        # Node agent
 │   ├── src/
 │   │   ├── main.rs          # Main entry point
 │   │   ├── client/          # HTTP client for sending metrics
@@ -102,14 +102,14 @@ helioscope/
 │   │   │       └── statik.rs # Static system info
 │   │   ├── config.rs        # Configuration loading
 │   │   └── utils/           # Utility functions
-│   └── helioscope-node.toml # Example configuration
-├── helioscope-collector/   # Collector server
+│   └── ferrview-node.toml # Example configuration
+├── ferrview-collector/   # Collector server
 │   ├── src/
 │   │   ├── main.rs          # Main entry point
 │   │   ├── http/            # HTTP server and API
 │   │   ├── store/           # Data storage
 │   │   └── charts/          # Chart rendering
-│   └── helioscope-collector.toml # Example configuration
+│   └── ferrview-collector.toml # Example configuration
 ├── Cargo.toml              # Workspace configuration
 └── README.md               # Project documentation
 ```
@@ -157,7 +157,7 @@ The release build is optimized for minimal binary size with:
 - Symbol stripping with separate debug info
 - Single codegen unit for optimal optimization
 
-## Extending Helioscope
+## Extending Ferrview
 
 ### Adding New Probes
 
@@ -178,7 +178,7 @@ pub fn probe_example(sys: &System) {
 
 ## License
 
-Helioscope is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). See the [LICENSE](LICENSE) file for details.
+Ferrview is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0). See the [LICENSE](LICENSE) file for details.
 
 ## Contributing
 

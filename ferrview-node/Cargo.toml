@@ -1,0 +1,23 @@
+[package]
+name = "ferrview-node"
+version.workspace = true
+edition.workspace = true
+description.workspace = true
+repository.workspace = true
+license.workspace = true
+
+[dependencies]
+argh.workspace = true
+basic-toml.workspace = true
+bytes = { version = "1.0" }
+ferrview-common = { path = "../ferrview-common" }
+http-body-util = { version = "0.1" }
+hyper = { version = "1.0", features = ["client", "http2"] }
+hyper-util = { version = "0.1", features = ["client-legacy", "http2", "tokio"] }
+serde.workspace = true
+serde_json = { version = "1" }
+sysinfo = { version = "0.37" }
+time.workspace = true
+tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
+tracing.workspace = true
+tracing-subscriber.workspace = true

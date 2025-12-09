@@ -1,0 +1,3 @@
+# ferrview-collector.toml - Configuration (static)
+metrics_collector_addr = "hostname:port (ip address is ok too)"
+data_dir = "data"
