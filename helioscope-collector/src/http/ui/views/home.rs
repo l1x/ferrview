@@ -11,22 +11,21 @@ pub fn render(nodes: &[NodeSummary]) -> String {
         styles::INFO_ROWS,
     );
 
-    let stats_html = format!(
-        r#"            <div class="stats">
-                {}
-                {}
-            </div>"#,
-        components::stat_card(&nodes.len().to_string(), "Active Nodes"),
-        components::stat_card("✓", "Collector Running"),
-    );
-
     let header_html = format!(
         r#"        <header>
-            <h1>🌞 Helioscope</h1>
-            <p class="subtitle">System Monitoring Dashboard</p>
-{}
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>🌞 Helioscope</h1>
+                    <p class="subtitle">System Monitoring</p>
+                </div>
+                <div class="header-right">
+                    {}
+                    {}
+                </div>
+            </div>
         </header>"#,
-        stats_html
+        components::stat_card(&nodes.len().to_string(), "Active Nodes"),
+        components::stat_card("✓", "Running"),
     );
 
     let nodes_html = if nodes.is_empty() {

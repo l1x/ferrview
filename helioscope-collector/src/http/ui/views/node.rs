@@ -25,26 +25,30 @@ pub fn render(node: &NodeDetails) -> String {
 
     let header = format!(
         r#"        <header>
-            <div class="breadcrumb"><a href="/ui">← Back to Dashboard</a></div>
-            <h1>{}</h1>
-            <p class="node-id-full">{}</p>
-            <div class="node-meta">
-                {}
-                {}
-                {}
-                {}
-                {}
-                {}
+            <div class="breadcrumb"><a href="/ui">← Dashboard</a></div>
+            <div class="node-header-content">
+                <div class="node-title-section">
+                    <h1>{}</h1>
+                    <p class="node-id-compact">{}</p>
+                </div>
+                <div class="node-meta-compact">
+                    {}
+                    {}
+                    {}
+                    {}
+                    {}
+                    {}
+                </div>
             </div>
         </header>"#,
         display_name,
-        node.node_id,
-        components::meta_item("Hostname", hostname),
+        short_id,
         components::meta_item("OS", os),
-        components::meta_item("Kernel", kernel),
-        components::meta_item("CPU Arch", arch),
-        components::meta_item("CPU Cores", cores),
+        components::meta_item("Arch", arch),
+        components::meta_item("Cores", cores),
         components::meta_item("Memory", &memory),
+        components::meta_item("Kernel", kernel),
+        components::meta_item("Host", hostname),
     );
 
     let charts = format!(

@@ -178,7 +178,7 @@ pub async fn handle_temperature_chart(
 }
 
 fn render_chart(chart_data: &ChartData) -> (StatusCode, BoxBody) {
-    let config = TimeSeriesChart::new(800, 400);
+    let config = TimeSeriesChart::new(1200, 500);
     let renderer = SvgRenderer::new(config);
 
     match renderer.render_to_string(chart_data) {
