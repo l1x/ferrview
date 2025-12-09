@@ -23,6 +23,7 @@ pub struct HealthResponse {
 }
 
 /// Standard error response
+#[allow(dead_code)]
 #[derive(Debug, Serialize)]
 pub struct ErrorResponse {
     pub error: String,

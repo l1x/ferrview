@@ -16,5 +16,5 @@ description = "[DEV] cargo build"
 run = "cargo build"
 
 [tasks.build-rust-release]
-description = "[RELEASE] cargo build --release "
-run = "cargo build --release"
+description = "[RELEASE] cargo build --release"
+run = "cargo build --release --timings"

@@ -8,6 +8,7 @@ use crate::store::errors::StoreError;
 
 /// A single metric data point from the database
 #[derive(Debug, Clone)]
+#[allow(dead_code)]
 pub struct MetricDataPoint {
     pub node_id: String,
     pub timestamp: String,
@@ -17,6 +18,7 @@ pub struct MetricDataPoint {
 }
 
 /// Query metrics for a specific node within a time range
+#[allow(dead_code)]
 pub async fn query_node_metrics(
     conn: &mut SqliteConnection,
     node_id: &str,
@@ -129,6 +131,7 @@ pub async fn query_latest_node_metrics(
 }
 
 /// Query metrics for all nodes within a time range
+#[allow(dead_code)]
 pub async fn query_all_nodes_metrics(
     conn: &mut SqliteConnection,
     metric_pattern: &str,
@@ -188,6 +191,7 @@ struct MetricRow {
 }
 
 /// Format timestamp in ISO 8601 format for SQLite queries
+#[allow(dead_code)]
 fn format_timestamp(dt: OffsetDateTime) -> String {
     dt.format(&time::format_description::well_known::Rfc3339)
         .unwrap_or_else(|_| String::from("1970-01-01T00:00:00Z"))

@@ -49,10 +49,6 @@ impl TimeSeries {
     pub fn is_empty(&self) -> bool {
         self.points.is_empty()
     }
-
-    pub fn len(&self) -> usize {
-        self.points.len()
-    }
 }
 
 /// Chart configuration and data container
@@ -124,16 +120,6 @@ impl TimeSeriesChart {
             height,
             ..Default::default()
         }
-    }
-
-    pub fn with_grid(mut self, show_grid: bool) -> Self {
-        self.show_grid = show_grid;
-        self
-    }
-
-    pub fn with_legend(mut self, show_legend: bool) -> Self {
-        self.show_legend = show_legend;
-        self
     }
 }
 

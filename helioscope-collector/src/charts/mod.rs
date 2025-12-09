@@ -5,5 +5,5 @@
 pub mod renderer;
 pub mod types;
 
-pub use renderer::{RenderError, SvgRenderer};
-pub use types::{ChartData, MetricPoint, TimeSeries, TimeSeriesChart};
+pub use renderer::SvgRenderer;
+pub use types::{ChartData, TimeSeries, TimeSeriesChart};

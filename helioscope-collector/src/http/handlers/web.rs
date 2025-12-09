@@ -100,10 +100,9 @@ fn build_node_summary(node_id: &str, metrics: &[MetricDataPoint]) -> NodeSummary
                 // Extract temperature sensor readings to find max
                 if metric.probe_name.starts_with("temperature_sensor_")
                     && metric.probe_name.ends_with("_celsius")
+                    && let Ok(temp) = metric.probe_value.parse::<f64>()
                 {
-                    if let Ok(temp) = metric.probe_value.parse::<f64>() {
-                        max_temp = Some(max_temp.map_or(temp, |current| current.max(temp)));
-                    }
+                    max_temp = Some(max_temp.map_or(temp, |current| current.max(temp)));
                 }
             }
         }

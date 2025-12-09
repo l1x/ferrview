@@ -65,10 +65,10 @@ pub fn group_metrics_by_index(
                 format!("#{}", index)
             };
 
-            if let Ok(timestamp) = parse_timestamp(&metric.timestamp) {
-                if let Ok(value) = metric.probe_value.parse::<f64>() {
-                    map.entry(label).or_default().push((timestamp, value));
-                }
+            if let Ok(timestamp) = parse_timestamp(&metric.timestamp)
+                && let Ok(value) = metric.probe_value.parse::<f64>()
+            {
+                map.entry(label).or_default().push((timestamp, value));
             }
         }
     }

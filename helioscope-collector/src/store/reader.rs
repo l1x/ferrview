@@ -85,6 +85,7 @@ impl ReaderPool {
     }
 
     /// Query all distinct node IDs in the database
+    #[allow(dead_code)]
     pub async fn query_all_node_ids(&self) -> Result<Vec<String>, StoreError> {
         debug!("Querying all distinct node IDs");
 
@@ -106,6 +107,7 @@ impl ReaderPool {
     }
 
     /// Query the latest metrics for a specific node
+    #[allow(dead_code)]
     pub async fn query_latest_node_metrics(
         &self,
         node_id: &str,
@@ -145,6 +147,7 @@ impl ReaderPool {
     }
 
     /// Close the connection pool gracefully
+    #[allow(dead_code)]
     pub async fn close(self) {
         self.pool.close().await;
         info!("Reader pool closed");
