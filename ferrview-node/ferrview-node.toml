@@ -12,3 +12,4 @@ memory = true
 temperature = true
 static_info = true
 disk = true
+network = true

@@ -28,6 +28,8 @@ pub struct SysinfoProbes {
     pub static_info: bool,
     #[serde(default)]
     pub disk: bool,
+    #[serde(default)]
+    pub network: bool,
 }
 
 impl Config {

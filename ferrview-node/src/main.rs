@@ -1,6 +1,6 @@
 use argh::FromArgs;
 use std::time::Duration;
-use sysinfo::{Components, Disks, System};
+use sysinfo::{Components, Disks, Networks, System};
 use tracing::{debug, error, info};
 use tracing_subscriber::{EnvFilter, fmt::time::UtcTime};
 
@@ -8,7 +8,7 @@ use crate::{
     client::http::HttpClient,
     client::retry::send_with_retry,
     config::Config,
-    probes::sysinfo::{cpu, disk, mem, statik, temp},
+    probes::sysinfo::{cpu, disk, mem, network, statik, temp},
     utils::timestamp::get_utc_formatter,
 };
 
@@ -61,6 +61,7 @@ async fn main() {
     let mut sys = System::new_all();
     let mut disks = Disks::new_with_refreshed_list();
     let mut components = Components::new_with_refreshed_list();
+    let mut networks = Networks::new_with_refreshed_list();
 
     // Perform initial CPU refresh with delay for accurate first reading
     info!("Performing initial CPU refresh for accurate readings");
@@ -108,6 +109,12 @@ async fn main() {
             let temp_data = temp::probe_temperature(&mut components, &config.node_id);
             debug!("Collected {} temperature metrics", temp_data.len());
             all_data.extend(temp_data);
+        }
+
+        if config.probes.sysinfo.network {
+            let network_data = network::probe_networks(&mut networks, &config.node_id);
+            debug!("Collected {} network metrics", network_data.len());
+            all_data.extend(network_data);
         }
 
         info!("Collected {} total metrics", all_data.len());
