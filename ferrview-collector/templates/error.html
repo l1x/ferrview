@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block styles %}
+.error-container {
+    text-align: center;
+    padding: 60px 40px;
+    background: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+.error-container h1 {
+    color: #dc3545;
+    font-size: 2em;
+    margin-bottom: 15px;
+}
+.error-container p {
+    color: var(--text-secondary);
+    margin-bottom: 25px;
+}
+{% endblock %}
+
+{% block content %}
+        <div class="error-container">
+            <h1>{{ title }}</h1>
+            <p>{{ message }}</p>
+            <a href="/ui" class="btn btn-primary">Back to Dashboard</a>
+        </div>
+{% endblock %}

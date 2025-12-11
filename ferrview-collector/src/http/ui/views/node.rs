@@ -1,105 +1,22 @@
 // src/http/ui/views/node.rs
 
-use crate::http::ui::{components, helpers, layout, models::NodeDetails, styles};
+use askama::Template;
+
+use crate::http::ui::{helpers, models::NodeDetails, templates::NodeTemplate};
 
 pub fn render(node: &NodeDetails) -> String {
-    let extra_styles = format!(
-        "{}{}{}",
-        styles::HEADER,
-        styles::BUTTONS,
-        styles::NODE_DASHBOARD,
-    );
-
     let short_id = helpers::shorten_uuid(&node.node_id);
-
-    let hostname = node.hostname.as_deref().unwrap_or("N/A");
     let display_name = node.hostname.as_deref().unwrap_or(&short_id);
-    let os = node.os_name.as_deref().unwrap_or("N/A");
-    let kernel = node.kernel_version.as_deref().unwrap_or("N/A");
-    let arch = node.cpu_arch.as_deref().unwrap_or("N/A");
-    let cores = node.cpu_cores.as_deref().unwrap_or("N/A");
-    let memory = node
-        .memory_total_gb
-        .map(helpers::format_memory_gb)
-        .unwrap_or_else(|| "N/A".to_string());
 
-    let header = format!(
-        r#"        <header>
-            <div class="breadcrumb"><a href="/ui">← Dashboard</a></div>
-            <div class="node-header-content">
-                <div class="node-title-section">
-                    <h1>{}</h1>
-                    <p class="node-id-compact">{}</p>
-                </div>
-                <div class="node-meta-compact">
-                    {}
-                    {}
-                    {}
-                    {}
-                    {}
-                    {}
-                </div>
-            </div>
-        </header>"#,
+    let template = NodeTemplate {
+        node,
+        short_id: &short_id,
         display_name,
-        short_id,
-        components::meta_item("OS", os),
-        components::meta_item("Arch", arch),
-        components::meta_item("Cores", cores),
-        components::meta_item("Memory", &memory),
-        components::meta_item("Kernel", kernel),
-        components::meta_item("Host", hostname),
-    );
+        version: env!("CARGO_PKG_VERSION"),
+    };
 
-    let charts = format!(
-        r#"        <div class="charts-section">
-            <h2>System Metrics (Last 24 Hours)</h2>
-            <div class="charts-grid">
-                {}
-                {}
-                {}
-            </div>
-        </div>"#,
-        components::chart_card(
-            "CPU Usage",
-            &format!("/ui/node/{}/cpu.svg", node.node_id),
-            "CPU Usage"
-        ),
-        components::chart_card(
-            "Memory Usage",
-            &format!("/ui/node/{}/memory.svg", node.node_id),
-            "Memory Usage"
-        ),
-        components::chart_card(
-            "Temperature",
-            &format!("/ui/node/{}/temperature.svg", node.node_id),
-            "Temperature"
-        ),
-    );
-
-    let actions = format!(
-        r#"        <div class="actions">
-            {}
-            {}
-            {}
-        </div>"#,
-        components::button(
-            &format!("/ui/node/{}/cpu.svg", node.node_id),
-            "Download CPU Chart",
-            "secondary"
-        ),
-        components::button(
-            &format!("/ui/node/{}/memory.svg", node.node_id),
-            "Download Memory Chart",
-            "secondary"
-        ),
-        components::button(
-            &format!("/ui/node/{}/temperature.svg", node.node_id),
-            "Download Temp Chart",
-            "secondary"
-        ),
-    );
-
-    let content = format!("{}\n{}\n{}", header, charts, actions);
-    layout::render(&format!("Node {}", short_id), &content, &extra_styles)
+    template.render().unwrap_or_else(|e| {
+        tracing::error!("Failed to render node template: {}", e);
+        format!("Template error: {}", e)
+    })
 }

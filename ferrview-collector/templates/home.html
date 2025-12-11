@@ -1,0 +1,185 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block styles %}
+header {
+    background: var(--card-bg);
+    border-radius: 8px;
+    padding: 15px 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.header-left {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+}
+.header-right {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+header h1 {
+    color: var(--accent-color);
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: 600;
+}
+.subtitle {
+    color: var(--text-secondary);
+    font-size: 0.9em;
+    margin: 0;
+}
+
+.stats { display: flex; gap: 10px; }
+.stat-card {
+    background: var(--secondary-bg);
+    padding: 8px 16px;
+    border-radius: 6px;
+    border-left: 3px solid var(--accent-color);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.stat-value {
+    font-size: 1.3em;
+    font-weight: 700;
+    color: var(--accent-color);
+}
+.stat-label {
+    color: var(--text-secondary);
+    font-size: 0.85em;
+    white-space: nowrap;
+}
+
+.nodes-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(500px, 1fr));
+    gap: 20px;
+}
+.node-card {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 25px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+.node-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+.node-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--border-color);
+}
+.node-header h3 { color: var(--text-primary); font-size: 1.3em; margin-bottom: 5px; }
+.node-header .subtitle {
+    margin: 0;
+    padding: 0;
+    font-size: 0.9em;
+    color: var(--text-secondary);
+    font-weight: normal;
+}
+.status-badge {
+    padding: 5px 12px;
+    border-radius: 20px;
+    font-size: 0.85em;
+    font-weight: 600;
+    background: var(--accent-color);
+    color: white;
+}
+.node-info { margin-bottom: 20px; }
+.node-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+.no-data {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    color: var(--text-secondary);
+}
+
+.info-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+.info-label { color: var(--text-secondary); font-weight: 500; }
+.info-value { color: var(--text-primary); font-weight: 600; }
+{% endblock %}
+
+{% block content %}
+        <header>
+            <div class="header-content">
+                <div class="header-left">
+                    <h1>ferrview #</h1>
+                </div>
+                <div class="header-right">
+                    <div class="stat-card">
+                        <div class="stat-value">{{ nodes.len() }}</div>
+                        <div class="stat-label">Active Nodes</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value">✓</div>
+                        <div class="stat-label">Running</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+{% if nodes.is_empty() %}
+        <div class="no-data">
+            <p>No nodes detected yet. Waiting for metrics...</p>
+        </div>
+{% else %}
+        <div class="nodes-grid">
+{% for node in nodes %}
+            <div class="node-card">
+                <div class="node-header">
+                    <h3>{% match node.hostname %}{% when Some with (h) %}{{ h }}{% when None %}{{ node.node_id|shorten_uuid }}{% endmatch %}</h3>
+                    <p class="subtitle">{% match node.cpu_arch %}{% when Some with (a) %}{{ a }}{% when None %}N/A{% endmatch %}</p>
+                    <span class="status-badge">Active</span>
+                </div>
+                <div class="node-info">
+                    <div class="info-row">
+                        <span class="info-label">Full ID</span>
+                        <span class="info-value">{{ node.node_id }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">CPU Cores</span>
+                        <span class="info-value">{% match node.cpu_cores %}{% when Some with (c) %}{{ c }}{% when None %}N/A{% endmatch %}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Memory</span>
+                        <span class="info-value">{{ node.memory_total_gb|format_memory }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Temp Sensors</span>
+                        <span class="info-value">{% match node.temp_sensors %}{% when Some with (s) %}{{ s }}{% when None %}N/A{% endmatch %}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Max Temp</span>
+                        <span class="info-value">{{ node.max_temp_celsius|format_temp }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Last Seen</span>
+                        <span class="info-value">{{ node.last_seen|format_timestamp }}</span>
+                    </div>
+                </div>
+                <div class="node-actions">
+                    <a href="/ui/node/{{ node.node_id }}" class="btn btn-primary">View Node</a>
+                </div>
+            </div>
+{% endfor %}
+        </div>
+{% endif %}
+{% endblock %}

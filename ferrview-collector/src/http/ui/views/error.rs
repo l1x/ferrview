@@ -1,18 +1,18 @@
 // src/http/ui/views/error.rs
 
-use crate::http::ui::{components, layout, styles};
+use askama::Template;
+
+use crate::http::ui::templates::ErrorTemplate;
 
 pub fn render(title: &str, message: &str) -> String {
-    let content = format!(
-        r#"        <div class="error-container">
-            <h1>⚠️ {}</h1>
-            <p>{}</p>
-            {}
-        </div>"#,
+    let template = ErrorTemplate {
         title,
         message,
-        components::button("/ui", "Back to Dashboard", "primary"),
-    );
+        version: env!("CARGO_PKG_VERSION"),
+    };
 
-    layout::render("Error", &content, styles::ERROR_PAGE)
+    template.render().unwrap_or_else(|e| {
+        tracing::error!("Failed to render error template: {}", e);
+        format!("Template error: {}", e)
+    })
 }

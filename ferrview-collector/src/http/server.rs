@@ -147,6 +147,8 @@ async fn route_node(path: &str, state: &ServerState) -> (hyper::StatusCode, BoxB
             "temperature.svg" => {
                 charts::handle_temperature_chart(node_id, hours, &state.reader).await
             }
+            "network.svg" => charts::handle_network_chart(node_id, hours, &state.reader).await,
+            "disk.svg" => charts::handle_disk_chart(node_id, hours, &state.reader).await,
             _ => api::handle_not_found().await,
         };
         let content_type = if chart_file.ends_with(".svg") {

@@ -12,20 +12,6 @@ pub fn shorten_uuid(uuid: &str) -> String {
     }
 }
 
-/// Format ISO timestamp for display (YYYY-MM-DD HH:MM:SS)
-pub fn format_timestamp(timestamp: &str) -> String {
-    if timestamp.len() >= 19 {
-        format!("{} {}", &timestamp[..10], &timestamp[11..19])
-    } else {
-        timestamp.to_string()
-    }
-}
-
-/// Format bytes as GB
-pub fn format_memory_gb(gb: f64) -> String {
-    format!("{:.1} GB", gb)
-}
-
 /// Parse ISO timestamp to Unix timestamp
 pub fn parse_timestamp(timestamp_str: &str) -> Result<i64, ()> {
     time::OffsetDateTime::parse(
@@ -89,14 +75,6 @@ mod tests {
     fn test_shorten_uuid() {
         assert_eq!(shorten_uuid("d6f0a1c9-a494-4567"), "d6f0a1c9...");
         assert_eq!(shorten_uuid("short"), "short");
-    }
-
-    #[test]
-    fn test_format_timestamp() {
-        assert_eq!(
-            format_timestamp("2024-12-08T09:41:30Z"),
-            "2024-12-08 09:41:30"
-        );
     }
 
     #[test]
