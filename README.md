@@ -11,6 +11,9 @@ Ferrview is a modular system monitoring utility designed to collect and display 
 - **CPU Monitoring**: Core count, frequency, and individual core information
 - **Memory Analysis**: RAM usage, swap usage, and percentage calculations
 - **Temperature Sensing**: Hardware temperature readings with critical thresholds
+- **Disk Monitoring**: Disk usage and capacity per mount point
+- **Network Monitoring**: Interface traffic statistics (bytes sent/received)
+- **Process Monitoring**: Fork rate tracking via /proc/stat (Linux)
 - **Configurable Probes**: Enable/disable specific monitoring modules via TOML configuration
 - **Structured Logging**: JSON-formatted output with timestamps for easy parsing
 - **Lightweight**: Minimal dependencies and optimized binary size
@@ -51,7 +54,8 @@ disk = true          # Disk information
 network = true       # Network interface data
 temperature = true   # Hardware temperature sensors
 
-#[probes.some_other_probe]
+[probes.procfs]
+forks = true         # Process creation monitoring (Linux only)
 ```
 
 ## Usage
@@ -95,11 +99,15 @@ ferrview/
 │   │   ├── main.rs          # Main entry point
 │   │   ├── client/          # HTTP client for sending metrics
 │   │   ├── probes/          # Monitoring probes
-│   │   │   └── sysinfo/     # System information probes
-│   │   │       ├── cpu.rs    # CPU monitoring
-│   │   │       ├── mem.rs    # Memory monitoring
-│   │   │       ├── temp.rs   # Temperature monitoring
-│   │   │       └── statik.rs # Static system info
+│   │   │   ├── sysinfo/     # System information probes
+│   │   │   │   ├── cpu.rs    # CPU monitoring
+│   │   │   │   ├── mem.rs    # Memory monitoring
+│   │   │   │   ├── disk.rs   # Disk monitoring
+│   │   │   │   ├── network.rs # Network monitoring
+│   │   │   │   ├── temp.rs   # Temperature monitoring
+│   │   │   │   └── statik.rs # Static system info
+│   │   │   └── procfs/      # Linux /proc filesystem probes
+│   │   │       └── forks.rs  # Process fork monitoring
 │   │   ├── config.rs        # Configuration loading
 │   │   └── utils/           # Utility functions
 │   └── ferrview-node.toml # Example configuration
@@ -193,9 +201,9 @@ Contributions are welcome! Please feel free to submit pull requests or open issu
 
 ### Node Agent
 
-- [ ] Disk usage monitoring
-- [ ] Network interface statistics
-- [ ] Process monitoring
+- [x] Disk usage monitoring ✓
+- [x] Network interface statistics ✓
+- [x] Process monitoring (forks) ✓
 - [ ] GPU information (where available)
 - [ ] Battery status (for laptops)
 
