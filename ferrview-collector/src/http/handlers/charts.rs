@@ -291,6 +291,48 @@ pub async fn handle_disk_chart(
     render_chart(&chart_data)
 }
 
+pub async fn handle_forks_chart(
+    node_id: &str,
+    hours: u32,
+    reader: &ReaderPool,
+) -> (StatusCode, BoxBody) {
+    debug!("Generating forks chart for node {} ({}h)", node_id, hours);
+
+    let metrics = match reader
+        .query_node_metrics(node_id, "forks_total", hours)
+        .await
+    {
+        Ok(m) => m,
+        Err(e) => {
+            error!("Failed to query forks metrics: {}", e);
+            return response::svg_error("Query failed");
+        }
+    };
+
+    if metrics.is_empty() {
+        return response::svg_error("No forks data available");
+    }
+
+    let mut chart_data = ChartData::new(format!(
+        "Process Forks - Node {}",
+        helpers::shorten_uuid(node_id)
+    ))
+    .with_labels("Time", "Total Forks");
+
+    let mut series = TimeSeries::new("Forks (cumulative)").with_unit("");
+    for metric in &metrics {
+        if let (Ok(timestamp), Ok(value)) = (
+            helpers::parse_timestamp(&metric.timestamp),
+            metric.probe_value.parse::<f64>(),
+        ) {
+            series.add_point(timestamp, value);
+        }
+    }
+    chart_data.add_series(series);
+
+    render_chart(&chart_data)
+}
+
 fn render_chart(chart_data: &ChartData) -> (StatusCode, BoxBody) {
     let config = TimeSeriesChart::new(1200, 500);
     let renderer = SvgRenderer::new(config);

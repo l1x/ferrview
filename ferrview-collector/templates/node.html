@@ -176,6 +176,12 @@ header {
                         <img src="/ui/node/{{ node.node_id }}/disk.svg" alt="Disk Usage" loading="lazy">
                     </div>
                 </div>
+                <div class="chart-card">
+                    <h3>Process Forks</h3>
+                    <div class="chart-container">
+                        <img src="/ui/node/{{ node.node_id }}/forks.svg" alt="Process Forks" loading="lazy">
+                    </div>
+                </div>
             </div>
         </div>
         <div class="actions">
@@ -184,5 +190,6 @@ header {
             <a href="/ui/node/{{ node.node_id }}/temperature.svg" class="btn btn-secondary">Download Temp Chart</a>
             <a href="/ui/node/{{ node.node_id }}/network.svg" class="btn btn-secondary">Download Network Chart</a>
             <a href="/ui/node/{{ node.node_id }}/disk.svg" class="btn btn-secondary">Download Disk Chart</a>
+            <a href="/ui/node/{{ node.node_id }}/forks.svg" class="btn btn-secondary">Download Forks Chart</a>
         </div>
 {% endblock %}
