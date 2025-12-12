@@ -6,6 +6,18 @@ A lightweight system monitoring tool written in Rust.
 
 Ferrview is a modular system monitoring utility designed to collect and display system information through configurable probes. It uses the `sysinfo` crate to gather comprehensive system data and provides structured output via structured logging.
 
+## Web UI
+
+Ferrview includes a web dashboard for visualizing metrics from all monitored nodes.
+
+### Dashboard
+
+![Dashboard](docs/dashboard.png)
+
+### Node Detail
+
+![Node Detail](docs/node-detail.png)
+
 ## Features
 
 - **CPU Monitoring**: Core count, frequency, and individual core information
