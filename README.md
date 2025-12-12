@@ -4,7 +4,12 @@ A lightweight system monitoring tool written in Rust.
 
 ## Overview
 
-Ferrview is a modular system monitoring utility designed to collect and display system information through configurable probes. It uses the `sysinfo` crate to gather comprehensive system data and provides structured output via structured logging.
+Ferrview is a modular system monitoring utility with a client-server architecture:
+
+- **ferrview-node**: Agent that runs on each monitored machine, collecting system metrics via configurable probes
+- **ferrview-collector**: Central server that receives metrics from nodes, stores time-series data, and provides a web dashboard
+
+The node agent uses the `sysinfo` crate to gather comprehensive system data and sends it to the collector via HTTP.
 
 ## Web UI
 
@@ -47,12 +52,16 @@ cd ferrview
 # Build the project
 cargo build --release
 
-# The binary will be available at target/release/ferrview
+# Binaries will be available at:
+# - target/release/ferrview-node
+# - target/release/ferrview-collector
 ```
 
 ## Configuration
 
-Ferrview uses a TOML configuration file (`ferrview.toml`) to control which probes are active:
+### ferrview-node
+
+The node agent uses `ferrview-node.toml` to configure probes and collector address:
 
 ```toml
 node_id = "uuid or similar (string)"
@@ -70,34 +79,53 @@ temperature = true   # Hardware temperature sensors
 forks = true         # Process creation monitoring (Linux only)
 ```
 
-## Usage
+### ferrview-collector
 
-### Basic Usage
+The collector is configured via command-line arguments:
 
 ```bash
-# Run with default configuration
-./ferrview
+ferrview-collector -l 0.0.0.0 -p 8080 -d /path/to/data/
+```
+
+- `-l`: Listen address (default: 0.0.0.0)
+- `-p`: Port (default: 8080)
+- `-d`: Data directory for SQLite databases
+
+## Usage
+
+### Running the Collector
+
+Start the collector server first (typically on a central machine):
+
+```bash
+ferrview-collector -l 0.0.0.0 -p 8080 -d ./data/
 
 # Or using cargo
-cargo run
+cargo run -p ferrview-collector -- -l 0.0.0.0 -p 8080 -d ./data/
 ```
 
-### Output Format
+The web dashboard will be available at `http://localhost:8080`.
 
-Ferrview outputs structured JSON logs with UTC timestamps:
+### Running the Node Agent
 
-```
-2024-01-01T12:00:00Z INFO Starting ferrview
-2024-01-01T12:00:00Z INFO Starting CPU probe
-2024-01-01T12:00:00Z INFO Detected 8 CPU cores
+Run the node agent on each machine you want to monitor:
+
+```bash
+ferrview-node --config-file /path/to/ferrview-node.toml
+
+# Or using cargo
+cargo run -p ferrview-node -- --config-file ferrview-node/ferrview-node.toml
 ```
 
 ### Example Output
 
+The node agent outputs structured logs with UTC timestamps:
+
 ```
-2024-01-01T12:00:00Z INFO Starting memory probe
+2024-01-01T12:00:00Z INFO Starting ferrview-node
+2024-01-01T12:00:00Z INFO Starting CPU probe
+2024-01-01T12:00:00Z INFO Detected 8 CPU cores
 2024-01-01T12:00:00Z INFO Memory information total_memory_bytes=17179869184 used_memory_bytes=8589934592 memory_usage_percent="50.0"
-2024-01-01T12:00:00Z INFO Swap information total_swap_bytes=4294967296 used_swap_bytes=1073741824 swap_usage_percent="25.0"
 ```
 
 ## Project Structure
@@ -181,9 +209,9 @@ The release build is optimized for minimal binary size with:
 
 ### Adding New Probes
 
-1. Create a new module in `src/probes/`
+1. Create a new module in `ferrview-node/src/probes/`
 2. Implement probe functions following the existing pattern
-3. Add configuration options in `Config` struct
+3. Add configuration options in `ferrview-node/src/config.rs`
 4. Register the probe in the main execution flow
 
 ### Example Probe Structure
