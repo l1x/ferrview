@@ -172,10 +172,41 @@ ferrview/
 
 ## Development
 
+This project uses [mise](https://mise.jdx.dev/) for task management.
+
+### Available Tasks
+
+```
+mise tasks --all
+
+build-rust-dev      [DEV] cargo build
+build-rust-release  [RELEASE] cargo build --release
+check               Cargo check
+lint                Lint with Clippy, failing on warnings
+```
+
 ### Building for Development
 
 ```bash
-cargo build
+mise run build-rust-dev
+```
+
+### Building for Release
+
+```bash
+mise run build-rust-release
+```
+
+### Type Checking
+
+```bash
+mise run check
+```
+
+### Linting
+
+```bash
+mise run lint
 ```
 
 ### Running Tests
@@ -188,12 +219,6 @@ cargo test
 
 ```bash
 cargo fmt
-```
-
-### Linting
-
-```bash
-cargo clippy
 ```
 
 ## Performance
