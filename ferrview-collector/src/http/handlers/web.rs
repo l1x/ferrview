@@ -113,7 +113,8 @@ fn build_node_summary(node_id: &str, metrics: &[MetricDataPoint]) -> NodeSummary
 }
 
 fn build_node_details(node_id: &str, metrics: &[MetricDataPoint]) -> NodeDetails {
-    let mut details = NodeDetails::new(node_id.to_string());
+    let current_date = helpers::current_date();
+    let mut details = NodeDetails::new(node_id.to_string(), current_date);
 
     for metric in metrics {
         if details.last_seen.is_none() && !metric.timestamp.is_empty() {

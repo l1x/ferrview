@@ -78,6 +78,82 @@ header {
     border-radius: var(--border-radius-sm);
 }
 
+/* Date Range Selector */
+.date-range-selector {
+    background: var(--bg-card);
+    border-radius: var(--border-radius);
+    padding: 16px 20px;
+    margin-bottom: 16px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 16px;
+}
+
+.preset-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.preset-btn {
+    padding: 8px 16px;
+    border: 1px solid var(--separator);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+}
+.preset-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text-primary);
+}
+.preset-btn.active {
+    background: var(--accent);
+    color: #fff;
+    border-color: var(--accent);
+}
+
+.custom-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: auto;
+}
+.custom-range label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+.custom-range input[type="date"] {
+    padding: 6px 10px;
+    border: 1px solid var(--separator);
+    border-radius: var(--border-radius-sm);
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-size: 0.85rem;
+}
+.custom-range input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0.7);
+}
+.custom-range span {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+}
+.apply-btn {
+    padding: 6px 12px;
+    border: none;
+    border-radius: var(--border-radius-sm);
+    background: var(--accent);
+    color: #fff;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: opacity 0.15s ease;
+}
+.apply-btn:hover {
+    opacity: 0.9;
+}
+
 /* Mobile adjustments */
 @media (max-width: 430px) {
     .node-title {
@@ -92,6 +168,18 @@ header {
     }
     .chart-header {
         padding: 10px 12px;
+    }
+    .date-range-selector {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    .preset-buttons {
+        justify-content: center;
+    }
+    .custom-range {
+        margin-left: 0;
+        justify-content: center;
+        flex-wrap: wrap;
     }
 }
 
@@ -145,14 +233,28 @@ header {
             </div>
         </header>
         <div class="charts-section">
-            <h2>System Metrics (Last 24 Hours)</h2>
+            <h2 id="charts-title">System Metrics (Today)</h2>
+            <div class="date-range-selector">
+                <div class="preset-buttons">
+                    <button class="preset-btn active" data-range="today">Today</button>
+                    <button class="preset-btn" data-range="7d">Last 7 Days</button>
+                    <button class="preset-btn" data-range="30d">Last 30 Days</button>
+                </div>
+                <div class="custom-range">
+                    <label>Custom:</label>
+                    <input type="date" id="start-date" max="{{ current_date }}">
+                    <span>to</span>
+                    <input type="date" id="end-date" max="{{ current_date }}" value="{{ current_date }}">
+                    <button class="apply-btn" id="apply-custom">Apply</button>
+                </div>
+            </div>
             <div class="charts-grid">
                 <div class="chart-card">
                     <div class="chart-header">
                         <h3>CPU Usage</h3>
                     </div>
                     <div class="chart-container">
-                        <img src="/ui/node/{{ node.node_id }}/cpu.svg" alt="CPU Usage" loading="lazy">
+                        <img src="/ui/node/{{ node.node_id }}/cpu.svg?range=today" alt="CPU Usage" loading="lazy">
                     </div>
                 </div>
                 <div class="chart-card">
@@ -160,7 +262,7 @@ header {
                         <h3>Memory Usage</h3>
                     </div>
                     <div class="chart-container">
-                        <img src="/ui/node/{{ node.node_id }}/memory.svg" alt="Memory Usage" loading="lazy">
+                        <img src="/ui/node/{{ node.node_id }}/memory.svg?range=today" alt="Memory Usage" loading="lazy">
                     </div>
                 </div>
                 <div class="chart-card">
@@ -168,7 +270,7 @@ header {
                         <h3>Temperature</h3>
                     </div>
                     <div class="chart-container">
-                        <img src="/ui/node/{{ node.node_id }}/temperature.svg" alt="Temperature" loading="lazy">
+                        <img src="/ui/node/{{ node.node_id }}/temperature.svg?range=today" alt="Temperature" loading="lazy">
                     </div>
                 </div>
                 <div class="chart-card">
@@ -176,7 +278,7 @@ header {
                         <h3>Network Traffic</h3>
                     </div>
                     <div class="chart-container">
-                        <img src="/ui/node/{{ node.node_id }}/network.svg" alt="Network Traffic" loading="lazy">
+                        <img src="/ui/node/{{ node.node_id }}/network.svg?range=today" alt="Network Traffic" loading="lazy">
                     </div>
                 </div>
                 <div class="chart-card">
@@ -184,7 +286,7 @@ header {
                         <h3>Disk Usage</h3>
                     </div>
                     <div class="chart-container">
-                        <img src="/ui/node/{{ node.node_id }}/disk.svg" alt="Disk Usage" loading="lazy">
+                        <img src="/ui/node/{{ node.node_id }}/disk.svg?range=today" alt="Disk Usage" loading="lazy">
                     </div>
                 </div>
                 <div class="chart-card">
@@ -192,9 +294,69 @@ header {
                         <h3>Process Forks</h3>
                     </div>
                     <div class="chart-container">
-                        <img src="/ui/node/{{ node.node_id }}/forks.svg" alt="Process Forks" loading="lazy">
+                        <img src="/ui/node/{{ node.node_id }}/forks.svg?range=today" alt="Process Forks" loading="lazy">
                     </div>
                 </div>
             </div>
         </div>
+
+        <script>
+            // Date range selector functionality
+            const presetBtns = document.querySelectorAll('.preset-btn');
+            const startDate = document.getElementById('start-date');
+            const endDate = document.getElementById('end-date');
+            const applyBtn = document.getElementById('apply-custom');
+            const chartsTitle = document.getElementById('charts-title');
+
+            const rangeLabels = {
+                'today': 'Today',
+                '7d': 'Last 7 Days',
+                '30d': 'Last 30 Days'
+            };
+
+            function updateCharts(range, start, end) {
+                let params;
+                let label;
+
+                if (range === 'custom') {
+                    params = `?range=custom&start=${start}&end=${end}`;
+                    label = `${start} to ${end}`;
+                } else {
+                    params = `?range=${range}`;
+                    label = rangeLabels[range] || range;
+                }
+
+                // Update title
+                chartsTitle.textContent = `System Metrics (${label})`;
+
+                // Update all chart images
+                document.querySelectorAll('.chart-container img').forEach(img => {
+                    const base = img.src.split('?')[0];
+                    img.src = base + params;
+                });
+            }
+
+            // Preset button clicks
+            presetBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active state
+                    presetBtns.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    // Update charts
+                    updateCharts(btn.dataset.range);
+                });
+            });
+
+            // Custom range apply
+            applyBtn.addEventListener('click', () => {
+                const start = startDate.value;
+                const end = endDate.value;
+                if (start && end) {
+                    // Remove active state from presets
+                    presetBtns.forEach(b => b.classList.remove('active'));
+                    // Update charts
+                    updateCharts('custom', start, end);
+                }
+            });
+        </script>
 {% endblock %}

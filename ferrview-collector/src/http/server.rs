@@ -5,6 +5,7 @@ use hyper::server::conn::http1;
 use hyper::service::service_fn;
 use hyper::{Method, Request, Response};
 use hyper_util::rt::TokioIo;
+use std::collections::HashMap;
 use std::net::SocketAddr;
 use std::sync::Arc;
 use tokio::net::TcpListener;
@@ -12,13 +13,14 @@ use tracing::{debug, error, info};
 
 use crate::http::handlers::{api, charts, web};
 use crate::http::response::BoxBody;
+use crate::store::date_range::DateRange;
+use crate::store::date_range_reader::DateRangeReader;
 use crate::store::errors::StoreError;
-use crate::store::reader::ReaderPool;
 use crate::store::writer::WriterHandle;
 
 pub struct ServerState {
     pub writer: WriterHandle,
-    pub reader: ReaderPool,
+    pub date_range_reader: DateRangeReader,
     pub data_dir: String,
 }
 
@@ -32,7 +34,7 @@ impl HttpServer {
         host: &str,
         port: &str,
         writer: WriterHandle,
-        reader: ReaderPool,
+        date_range_reader: DateRangeReader,
         data_dir: String,
     ) -> Result<Self, StoreError> {
         let addr: SocketAddr = format!("{}:{}", host, port)
@@ -41,7 +43,7 @@ impl HttpServer {
 
         let state = Arc::new(ServerState {
             writer,
-            reader,
+            date_range_reader,
             data_dir,
         });
 
@@ -109,7 +111,9 @@ async fn route(
             let (s, b) = web::handle_home(&state.data_dir).await;
             (s, b, "text/html; charset=utf-8")
         }
-        (&Method::GET, _) if path.starts_with("/ui/node/") => route_node(path, &state).await,
+        (&Method::GET, _) if path.starts_with("/ui/node/") => {
+            route_node(path, req.uri().query(), &state).await
+        }
 
         // 404
         _ => {
@@ -125,7 +129,11 @@ async fn route(
         .unwrap())
 }
 
-async fn route_node(path: &str, state: &ServerState) -> (hyper::StatusCode, BoxBody, &'static str) {
+async fn route_node(
+    path: &str,
+    query: Option<&str>,
+    state: &ServerState,
+) -> (hyper::StatusCode, BoxBody, &'static str) {
     // Path: /ui/node/{node_id} or /ui/node/{node_id}/{chart}.svg
     let parts: Vec<&str> = path.split('/').collect();
     // parts: ["", "ui", "node", "{node_id}", ...]
@@ -136,20 +144,33 @@ async fn route_node(path: &str, state: &ServerState) -> (hyper::StatusCode, BoxB
     }
 
     let node_id = parts[3];
-    let hours = 24u32;
 
     // Chart routes: /ui/node/{id}/{chart}.svg
     if parts.len() == 5 {
         let chart_file = parts[4];
+
+        // Parse date range from query parameters
+        let range = parse_date_range_from_query(query);
+
         let (status, body) = match chart_file {
-            "cpu.svg" => charts::handle_cpu_chart(node_id, hours, &state.reader).await,
-            "memory.svg" => charts::handle_memory_chart(node_id, hours, &state.reader).await,
-            "temperature.svg" => {
-                charts::handle_temperature_chart(node_id, hours, &state.reader).await
+            "cpu.svg" => {
+                charts::handle_cpu_chart(node_id, &range, &state.date_range_reader).await
             }
-            "network.svg" => charts::handle_network_chart(node_id, hours, &state.reader).await,
-            "disk.svg" => charts::handle_disk_chart(node_id, hours, &state.reader).await,
-            "forks.svg" => charts::handle_forks_chart(node_id, hours, &state.reader).await,
+            "memory.svg" => {
+                charts::handle_memory_chart(node_id, &range, &state.date_range_reader).await
+            }
+            "temperature.svg" => {
+                charts::handle_temperature_chart(node_id, &range, &state.date_range_reader).await
+            }
+            "network.svg" => {
+                charts::handle_network_chart(node_id, &range, &state.date_range_reader).await
+            }
+            "disk.svg" => {
+                charts::handle_disk_chart(node_id, &range, &state.date_range_reader).await
+            }
+            "forks.svg" => {
+                charts::handle_forks_chart(node_id, &range, &state.date_range_reader).await
+            }
             _ => api::handle_not_found().await,
         };
         let content_type = if chart_file.ends_with(".svg") {
@@ -163,4 +184,36 @@ async fn route_node(path: &str, state: &ServerState) -> (hyper::StatusCode, BoxB
     // Dashboard route: /ui/node/{id}
     let (s, b) = web::handle_node_dashboard(node_id, &state.data_dir).await;
     (s, b, "text/html; charset=utf-8")
+}
+
+/// Parse query string into a HashMap
+fn parse_query_string(query: Option<&str>) -> HashMap<String, String> {
+    let mut params = HashMap::new();
+
+    if let Some(q) = query {
+        for pair in q.split('&') {
+            if let Some((key, value)) = pair.split_once('=') {
+                params.insert(key.to_string(), value.to_string());
+            }
+        }
+    }
+
+    params
+}
+
+/// Parse date range from query parameters
+fn parse_date_range_from_query(query: Option<&str>) -> DateRange {
+    let params = parse_query_string(query);
+
+    match params.get("range").map(|s| s.as_str()) {
+        Some("today") => DateRange::today(),
+        Some("7d") => DateRange::last_n_days(7),
+        Some("30d") => DateRange::last_n_days(30),
+        Some("custom") => {
+            let start = params.get("start").map(|s| s.as_str()).unwrap_or("");
+            let end = params.get("end").map(|s| s.as_str()).unwrap_or("");
+            DateRange::custom(start, end).unwrap_or_else(|_| DateRange::today())
+        }
+        _ => DateRange::today(), // Default to today
+    }
 }

@@ -12,6 +12,7 @@ pub fn render(node: &NodeDetails) -> String {
         node,
         display_name,
         version: env!("CARGO_PKG_VERSION"),
+        current_date: &node.current_date,
     };
 
     template.render().unwrap_or_else(|e| {

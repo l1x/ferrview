@@ -24,6 +24,7 @@ pub struct NodeDetails {
     pub cpu_cores: Option<String>,
     pub memory_total_gb: Option<f64>,
     pub last_seen: Option<String>,
+    pub current_date: String,
 }
 
 impl NodeSummary {
@@ -42,7 +43,7 @@ impl NodeSummary {
 }
 
 impl NodeDetails {
-    pub fn new(node_id: String) -> Self {
+    pub fn new(node_id: String, current_date: String) -> Self {
         Self {
             node_id,
             hostname: None,
@@ -52,6 +53,7 @@ impl NodeDetails {
             cpu_cores: None,
             memory_total_gb: None,
             last_seen: None,
+            current_date,
         }
     }
 }

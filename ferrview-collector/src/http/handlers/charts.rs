@@ -6,17 +6,21 @@ use tracing::{debug, error};
 use crate::charts::{ChartData, SvgRenderer, TimeSeries, TimeSeriesChart};
 use crate::http::response::{self, BoxBody};
 use crate::http::ui::helpers;
-use crate::store::reader::ReaderPool;
+use crate::store::date_range::DateRange;
+use crate::store::date_range_reader::DateRangeReader;
 
 pub async fn handle_cpu_chart(
     node_id: &str,
-    hours: u32,
-    reader: &ReaderPool,
+    range: &DateRange,
+    reader: &DateRangeReader,
 ) -> (StatusCode, BoxBody) {
-    debug!("Generating CPU chart for node {} ({}h)", node_id, hours);
+    debug!(
+        "Generating CPU chart for node {} ({} to {})",
+        node_id, range.start_date, range.end_date
+    );
 
     let metrics = match reader
-        .query_node_metrics(node_id, "cpu_core_%_usage_percent", hours)
+        .query_node_metrics(node_id, "cpu_core_%_usage_percent", range)
         .await
     {
         Ok(m) => m,
@@ -55,13 +59,16 @@ pub async fn handle_cpu_chart(
 
 pub async fn handle_memory_chart(
     node_id: &str,
-    hours: u32,
-    reader: &ReaderPool,
+    range: &DateRange,
+    reader: &DateRangeReader,
 ) -> (StatusCode, BoxBody) {
-    debug!("Generating memory chart for node {} ({}h)", node_id, hours);
+    debug!(
+        "Generating memory chart for node {} ({} to {})",
+        node_id, range.start_date, range.end_date
+    );
 
     let used_metrics = match reader
-        .query_node_metrics(node_id, "memory_used_bytes", hours)
+        .query_node_metrics(node_id, "memory_used_bytes", range)
         .await
     {
         Ok(m) => m,
@@ -72,7 +79,7 @@ pub async fn handle_memory_chart(
     };
 
     let total_metrics = match reader
-        .query_node_metrics(node_id, "memory_total_bytes", hours)
+        .query_node_metrics(node_id, "memory_total_bytes", range)
         .await
     {
         Ok(m) => m,
@@ -123,16 +130,16 @@ pub async fn handle_memory_chart(
 
 pub async fn handle_temperature_chart(
     node_id: &str,
-    hours: u32,
-    reader: &ReaderPool,
+    range: &DateRange,
+    reader: &DateRangeReader,
 ) -> (StatusCode, BoxBody) {
     debug!(
-        "Generating temperature chart for node {} ({}h)",
-        node_id, hours
+        "Generating temperature chart for node {} ({} to {})",
+        node_id, range.start_date, range.end_date
     );
 
     let metrics = match reader
-        .query_node_metrics(node_id, "temperature_sensor_%_celsius", hours)
+        .query_node_metrics(node_id, "temperature_sensor_%_celsius", range)
         .await
     {
         Ok(m) => m,
@@ -179,14 +186,17 @@ pub async fn handle_temperature_chart(
 
 pub async fn handle_network_chart(
     node_id: &str,
-    hours: u32,
-    reader: &ReaderPool,
+    range: &DateRange,
+    reader: &DateRangeReader,
 ) -> (StatusCode, BoxBody) {
-    debug!("Generating network chart for node {} ({}h)", node_id, hours);
+    debug!(
+        "Generating network chart for node {} ({} to {})",
+        node_id, range.start_date, range.end_date
+    );
 
     // Query received bytes
     let rx_metrics = match reader
-        .query_node_metrics(node_id, "network_interface_%_total_received_bytes", hours)
+        .query_node_metrics(node_id, "network_interface_%_total_received_bytes", range)
         .await
     {
         Ok(m) => m,
@@ -198,7 +208,7 @@ pub async fn handle_network_chart(
 
     // Query transmitted bytes
     let tx_metrics = match reader
-        .query_node_metrics(node_id, "network_interface_%_total_transmitted_bytes", hours)
+        .query_node_metrics(node_id, "network_interface_%_total_transmitted_bytes", range)
         .await
     {
         Ok(m) => m,
@@ -247,13 +257,16 @@ pub async fn handle_network_chart(
 
 pub async fn handle_disk_chart(
     node_id: &str,
-    hours: u32,
-    reader: &ReaderPool,
+    range: &DateRange,
+    reader: &DateRangeReader,
 ) -> (StatusCode, BoxBody) {
-    debug!("Generating disk chart for node {} ({}h)", node_id, hours);
+    debug!(
+        "Generating disk chart for node {} ({} to {})",
+        node_id, range.start_date, range.end_date
+    );
 
     let metrics = match reader
-        .query_node_metrics(node_id, "disk_%_usage_percent", hours)
+        .query_node_metrics(node_id, "disk_%_usage_percent", range)
         .await
     {
         Ok(m) => m,
@@ -293,13 +306,16 @@ pub async fn handle_disk_chart(
 
 pub async fn handle_forks_chart(
     node_id: &str,
-    hours: u32,
-    reader: &ReaderPool,
+    range: &DateRange,
+    reader: &DateRangeReader,
 ) -> (StatusCode, BoxBody) {
-    debug!("Generating forks chart for node {} ({}h)", node_id, hours);
+    debug!(
+        "Generating forks chart for node {} ({} to {})",
+        node_id, range.start_date, range.end_date
+    );
 
     let metrics = match reader
-        .query_node_metrics(node_id, "forks_total", hours)
+        .query_node_metrics(node_id, "forks_total", range)
         .await
     {
         Ok(m) => m,

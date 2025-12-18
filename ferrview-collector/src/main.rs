@@ -74,22 +74,16 @@ async fn main() {
         writer_service.run().await;
     });
 
-    // Initialize reader pool
-    let reader_pool = match store::reader::ReaderPool::new(&argz.data_dir).await {
-        Ok(pool) => pool,
-        Err(e) => {
-            error!("Failed to initialize reader pool: {}", e);
-            std::process::exit(1);
-        }
-    };
-    info!("Reader pool initialized");
+    // Initialize date range reader
+    let date_range_reader = store::date_range_reader::DateRangeReader::new(&argz.data_dir);
+    info!("Date range reader initialized");
 
     // Create and run HTTP server
     let server = match http::server::HttpServer::new(
         &argz.host,
         &argz.port,
         writer_handle,
-        reader_pool,
+        date_range_reader,
         argz.data_dir.clone(),
     ) {
         Ok(s) => s,

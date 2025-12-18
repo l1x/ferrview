@@ -58,6 +58,7 @@ pub struct NodeTemplate<'a> {
     pub node: &'a NodeDetails,
     pub display_name: &'a str,
     pub version: &'a str,
+    pub current_date: &'a str,
 }
 
 /// Error page template
